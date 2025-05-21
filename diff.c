@@ -1,12 +1,4 @@
 #include "rgba_io.h"
-#include <stdint.h>
-#include <stddef.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/stat.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <fcntl.h>
 
 /*
 The purpose of this program is to subtract one image layer's RGB values from

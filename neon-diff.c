@@ -1,11 +1,4 @@
 #include "rgba_io.h"
-#include <stdint.h>
-#include <stddef.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <fcntl.h>
 #include <arm_neon.h>
 
 /*
