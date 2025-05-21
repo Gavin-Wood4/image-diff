@@ -1,8 +1,9 @@
-#include <stdio.h>
+#include "rgba_io.h"
 #include <stdint.h>
 #include <stddef.h>
-#include <sys/stat.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <arm_neon.h>
@@ -12,10 +13,7 @@ The purpose of this program is to subtract one image layer's RGB values from
 another and output it's result in .rgba format using NEON libraries
 */
 
-int read_rgba(const char *filename, uint32_t **buf, size_t *size);
 void diff_rgba(uint32_t *img1, const uint32_t *img2, size_t size);
-int write_rgba(const char *filename, uint32_t *buf, size_t size);
-
 
 int main(int argc, char *argv[])
 {
@@ -43,31 +41,6 @@ err:	// Dump memory if image error
 	return printf("There was an error with one of the image files.");
 }
 
-int read_rgba(const char *filename, uint32_t **buf, size_t *size)
-{
-	struct stat st;
-	if (stat(filename, &st) == -1)
-		return -1;
-	*size = st.st_size;
-	*buf = malloc(*size); //Allocate buffer to be large enough for size
-	if (*buf == NULL) {
-		return -1;
-	}
-	int fd = open(filename, O_RDONLY);
-	if (fd == -1) {	// if file descriptor error then free buffer
-		free(*buf);
-		*buf = NULL;
-		return -1;
-	}
-	ssize_t	bytes_read = read(fd, *buf, *size); // Assign bytes_read for err check
-	close(fd);
-	if (bytes_read != *size) { 
-		free(*buf);
-		*buf = NULL;
-		return -1;
-	}
-	return 0;
-}
 
 void diff_rgba(uint32_t *img1, const uint32_t *img2, size_t size)
 {
@@ -88,16 +61,4 @@ void diff_rgba(uint32_t *img1, const uint32_t *img2, size_t size)
 	for (; i < num_pixels; i++) { // Process the last up to 3 pixels
 		img1[i] = ((img1[i] - img2[i]) & 0x00FFFFFF) | 0xFF000000;
 	}
-}
-
-int write_rgba(const char *filename, uint32_t *buf, size_t size) {
-	int fd = open(filename, O_CREAT | O_WRONLY | O_TRUNC, 0644);
-	if (fd == -1)
-		return -1;
-	ssize_t bytes_written = write(fd, buf, size);
-	close(fd);
-	if (bytes_written != size)
-		return -1;
-	free(buf);
-	return 0;
 }
