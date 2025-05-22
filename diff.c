@@ -51,13 +51,14 @@ static inline uint32_t abs_diff_pixel(uint32_t pix1, uint32_t pix2)
 		if (signed_difference < 0) signed_difference = -signed_difference;
 		pixout |= (uint32_t)signed_difference << shift;		// Place pixel back in place.
 	}
-	return pixout;
+	return pixout |= 0xFF000000;	// This forces opacity at 100%.
 }
 
 static void diff_rgba(uint32_t *img1, const uint32_t *img2, size_t size)
 {
+	size_t px = size / sizeof(uint32_t);
 	size_t i = 0;
-	for (; i < size; i++)
+	for (; i < px; ++i)
 		img1[i] = abs_diff_pixel(img1[i], img2[i]);
 }
 
