@@ -1,4 +1,8 @@
 #include "rgba_io.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <stddef.h>
 #include <arm_neon.h>
 
 /*
@@ -6,7 +10,7 @@ The purpose of this program is to subtract one image layer's RGB values from
 another and output it's result in .rgba format using NEON libraries
 */
 
-void diff_rgba(uint32_t *img1, const uint32_t *img2, size_t size);
+static void diff_rgba(uint32_t *img1, const uint32_t *img2, size_t size);
 
 int main(int argc, char *argv[])
 {
@@ -37,7 +41,7 @@ err:	// Dump memory if image error
 }
 
 
-void diff_rgba(uint32_t *img1, const uint32_t *img2, size_t size)
+static void diff_rgba(uint32_t *img1, const uint32_t *img2, size_t size)
 {
 	size_t num_pixels = size / sizeof(uint32_t);
 	size_t i = 0;	

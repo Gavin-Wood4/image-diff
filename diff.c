@@ -1,4 +1,8 @@
 #include "rgba_io.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <stddef.h>
 
 /*
 The purpose of this program is to subtract one image layer's RGB values from
@@ -45,7 +49,7 @@ static inline uint32_t abs_diff_pixel(uint32_t pix1, uint32_t pix2)
 		channel2 = (pix2 >> shift) & 0xFF;
 		signed_difference = channel1 - channel2;
 		if (signed_difference < 0) signed_difference = -signed_difference;
-		pixout |= (uint32_t)d << shift;		// Place pixel back in place.
+		pixout |= (uint32_t)signed_difference << shift;		// Place pixel back in place.
 	}
 	return pixout;
 }
@@ -53,7 +57,7 @@ static inline uint32_t abs_diff_pixel(uint32_t pix1, uint32_t pix2)
 static void diff_rgba(uint32_t *img1, const uint32_t *img2, size_t size)
 {
 	size_t i = 0;
-	for (i; i < n; i++)
+	for (; i < size; i++)
 		img1[i] = abs_diff_pixel(img1[i], img2[i]);
 }
 

@@ -1,4 +1,9 @@
 #include "rgba_io.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/stat.h>
 
 int read_rgba(const char *filename, uint32_t **buf, size_t *size)
 {
