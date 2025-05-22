@@ -10,9 +10,10 @@ void diff_rgba(uint32_t *img1, const uint32_t *img2, size_t size);
 
 int main(int argc, char *argv[])
 {
-	char arg_err_msg[] = "Incorrect number of arguments passed (must be 3.)";
-	if (argc != 4)
-		return printf(arg_err_msg);
+	if (argc != 4) {
+		fprintf(stderr, "Usage: %s <image1> <image2> <output>\n", argv[0]);
+		return EXIT_FAILURE;
+	}
 
 	uint32_t *img1 = NULL;
 	uint32_t *img2 = NULL;
@@ -26,12 +27,13 @@ int main(int argc, char *argv[])
 	if (write_rgba(argv[3], img1, size1) == -1) {
 		goto err;
 	}
-	return 0;	// For error checking compilation
+	return EXIT_SUCCESS;	// For error checking compilation
 
 err:	// Dump memory if image error
-	free(img1);
-	free(img2);
-	return printf("There was an error with one of the image files.");
+	if (img1) free(img1);
+	if (img2) free(img2);
+	fprintf(stderr, "There was an error with one of the image files.\n");
+	return EXIT_FAILURE;
 }
 
 
