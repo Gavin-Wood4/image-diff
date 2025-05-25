@@ -23,12 +23,23 @@ int main(int argc, char *argv[])
 	uint32_t *img2 = NULL;
 	size_t size1, size2;
 
-	if (read_rgba(argv[1], &img1, &size1) == -1)
+	if (read_rgba(argv[1], &img1, &size1) == -1) {
+		fprintf(stderr, "Error: Could not read %s.\n", argv[1]);
 		goto err;
-	if (read_rgba(argv[2], &img2, &size2) == -1)
+	}
+	if (read_rgba(argv[2], &img2, &size2) == -1) {
+		fprintf(stderr, "Error: Could not read %s.\n", argv[2]);
 		goto err;
+	}
+
+	if (size1 != size2) {
+		fprintf(stderr, "Error: Images must be the same dimensions.\n");
+		goto err;
+	}
 	diff_rgba(img1, img2, size1);
+	
 	if (write_rgba(argv[3], img1, size1) == -1) {
+		fprintf(stderr, "Error: Unable to write the new image.\n");
 		goto err;
 	}
 	return EXIT_SUCCESS;
@@ -44,7 +55,8 @@ static inline uint32_t abs_diff_pixel(uint32_t pix1, uint32_t pix2)
 {
 	uint32_t pixout = 0;
 	int channel1, channel2, signed_difference;
-	for (int shift = 0; shift < 32; shift += 8) {
+	int shift = 0;
+	for (; shift < 32; shift += 8) {
 		channel1 = (pix1 >> shift) & 0xFF;	// Extract the first color channel.
 		channel2 = (pix2 >> shift) & 0xFF;
 		signed_difference = channel1 - channel2;
@@ -56,9 +68,9 @@ static inline uint32_t abs_diff_pixel(uint32_t pix1, uint32_t pix2)
 
 static void diff_rgba(uint32_t *img1, const uint32_t *img2, size_t size)
 {
-	size_t px = size / sizeof(uint32_t);
+	size_t pxs = size / sizeof(uint32_t);
 	size_t i = 0;
-	for (; i < px; ++i)
+	for (; i < pxs; ++i)
 		img1[i] = abs_diff_pixel(img1[i], img2[i]);
 }
 

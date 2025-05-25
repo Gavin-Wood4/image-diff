@@ -23,15 +23,26 @@ int main(int argc, char *argv[])
 	uint32_t *img2 = NULL;
 	size_t size1, size2;
 
-	if (read_rgba(argv[1], &img1, &size1) == -1) // next 6 lines err check
-		goto err;
-	if (read_rgba(argv[2], &img2, &size2) == -1)
-		goto err;
-	diff_rgba(img1, img2, size1);
-	if (write_rgba(argv[3], img1, size1) == -1) {
+	if (read_rgba(argv[1], &img1, &size1) == -1) {
+		fprintf(stderr, "Error: Could not read %s.\n", argv[1]);
 		goto err;
 	}
-	return EXIT_SUCCESS;	// For error checking compilation
+	if (read_rgba(argv[2], &img2, &size2) == -1) {
+		fprintf(stderr, "Error: Could not read %s.\n", argv[2]);
+		goto err;
+	}
+		
+	if (size1 != size2) {
+		fprintf(stderr, "Error: Images must be the same dimensions.\n");
+		goto err;
+	}
+	diff_rgba(img1, img2, size1);
+	
+	if (write_rgba(argv[3], img1, size1) == -1) {
+		fprintf(stderr, "Error: Images must be the same dimensions.\n");
+		goto err;
+	}
+	return EXIT_SUCCESS;
 
 err:	// Dump memory if image error
 	if (img1) free(img1);
