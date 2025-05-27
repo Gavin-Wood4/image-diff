@@ -6,10 +6,10 @@ HOST	?= 0
 
 
 HOST_CC		?= gcc
-HOST_CFLAGS	?= -O2 -Wall -g -std=c11
+HOST_CFLAGS	?= -O3 -Wall -std=c11
 
 PI_CC		?= aarch64-linux-gnu-gcc
-PI_CFLAGS	?= -O2 -static -Wall -g -mcpu=cortex-a76
+PI_CFLAGS	?= -O3 -static -Wall -std=c11 -mcpu=cortex-a76
 
 # Picks compiler and flags depending on command line switch and processor architecture detection.
 ifneq ($(HOST),1)
