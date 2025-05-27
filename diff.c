@@ -17,7 +17,7 @@ static void diff_rgba(uint32_t *img1, const uint32_t *img2, size_t size, diff_mo
 int main(int argc, char *argv[])
 {
 	if (argc != 4 && argc != 5) {
-		fprintf(stderr, "Usage: %s <image1> <image2> <output> <absolute|saturated|modular>\n", argv[0]);
+		fprintf(stderr, "Usage: %s <image1> <image2> <output> <absolute|abs|saturated|sat|modular|mod>\n", argv[0]);
 		return EXIT_FAILURE;
 	}
 
@@ -57,11 +57,15 @@ int main(int argc, char *argv[])
 	
 	if (write_rgba(argv[3], img1, size1) == -1) {
 		fprintf(stderr, "Error: Unable to write the new image.\n");
-		goto err;
+		goto err;	
 	}
+
+	free(img1);
+	free(img2);
+
 	return EXIT_SUCCESS;
 
-err:	// Dumps memory if image reading or writing error.
+err:	// Dumps memory if image reading or writing error. 
 	if (img1) free(img1);
 	if (img2) free(img2);
 	fprintf(stderr, "There was an error with one of the image files.\n");
@@ -70,10 +74,10 @@ err:	// Dumps memory if image reading or writing error.
 
 static void diff_rgba(uint32_t *img1, const uint32_t *img2, size_t size, diff_mode_t mode)
 {
-	size_t pxs = size / sizeof(uint32_t);	// pxs represents the number of pixels in the image.
-	size_t i = 0;
+	size_t pxs = size / sizeof(uint32_t);	// 'pxs' is the number of pixels in the image.
+	size_t i;
 	uint32_t pix1, pix2, pixout;
-	for (; i < pxs; ++i) {
+	for (i = 0; i < pxs; ++i) {
 		pix1 = img1[i];
 		pix2 = img2[i];
 		pixout = 0;
@@ -82,7 +86,7 @@ static void diff_rgba(uint32_t *img1, const uint32_t *img2, size_t size, diff_mo
 		
 		int shift;
 		for (shift = 0; shift <= 16; shift += 8) {
-			channel1 = (pix1 >> shift) & 0xFF;	// This isolates one color channel, R(shift = 0) G(shift = 8), B (shift = 16)
+			channel1 = (pix1 >> shift) & 0xFF;	// This isolates one color channel from the desired pixel, R(shift = 0) G(shift = 8), and B (shift = 16).
 			channel2 = (pix2 >> shift) & 0xFF;	// The alpha channel is skipped so that images are not transparent (unintended behavior). 
 			difference = channel1 - channel2;
 
@@ -98,8 +102,10 @@ static void diff_rgba(uint32_t *img1, const uint32_t *img2, size_t size, diff_mo
 					output_channel = (difference < 0) ? (uint8_t)(-difference) : (uint8_t)difference;	// Change sign of difference to find absolute value if negative.
 					break;
 			}
+
 			pixout |= (uint32_t)output_channel << shift;
 		}
+
 		img1[i] = pixout | 0xFF000000;	// Forces 100% opacity.
 	}
 }

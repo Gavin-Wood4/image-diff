@@ -23,7 +23,14 @@ int read_rgba(const char *filename, uint32_t **buf, size_t *size)
 	}
 	ssize_t	bytes_read = read(fd, *buf, *size); // Assign bytes_read errchk
 	close(fd);
-	if (bytes_read != *size) { 
+
+	if (bytes_read < 0) {	// Error if bytes_read are negative. Will be unable to cast bytes_read to unsigned for comparison.
+		free(*buf);
+		*buf = NULL;
+		return -1;
+	}
+
+	if ((size_t)bytes_read != *size) { 
 		free(*buf);
 		*buf = NULL;
 		return -1;
@@ -37,8 +44,12 @@ int write_rgba(const char *filename, uint32_t *buf, size_t size) {
 		return -1;
 	ssize_t bytes_written = write(fd, buf, size);
 	close(fd);
-	if (bytes_written != size)
+
+	if (bytes_written < 0) {
+		return -1;		// Error if no bytes were written. 
+	}
+
+	if ((size_t)bytes_written != size)
 		return -1;
-	free(buf);
 	return 0;
 }

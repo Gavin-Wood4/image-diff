@@ -6,10 +6,10 @@ HOST	?= 0
 
 
 HOST_CC		?= gcc
-HOST_CFLAGS	?= -O3 -Wall -std=c11
+HOST_CFLAGS	?= -O3 -Wall -Wextra -pedantic -std=c11
 
 PI_CC		?= aarch64-linux-gnu-gcc
-PI_CFLAGS	?= -O3 -static -Wall -std=c11 -mcpu=cortex-a76
+PI_CFLAGS	?= -O3 -static -Wall -Wextra -pedantic -std=c11 -mcpu=cortex-a76
 
 # Picks compiler and flags depending on command line switch and processor architecture detection.
 ifneq ($(HOST),1)
@@ -54,7 +54,7 @@ neon-diff: $(NEON_OBJS)
 
 
 clean:
-	rm -f diff.o neon-diff.o rgba_io.o diff neon-diff $(TARGETS)
+	rm -f diff.o neon-diff.o rgba_io.o $(TARGETS)
 
 
 .PHONY: all clean
