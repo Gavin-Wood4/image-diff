@@ -6,7 +6,7 @@ HOST	?= 0
 
 
 HOST_CC		?= gcc
-HOST_CFLAGS	?= -O3 -Wall -Wextra -pedantic -std=c11
+HOST_CFLAGS	?= -O3 -Wall -Wextra -pedantic -fanalyzer -Wconversion -Wsign-conversion -Wshadow -Wpointer-arith -Wcast-align -Wcast-qual -Wstrict-overflow=5 -std=c11
 
 PI_CC		?= aarch64-linux-gnu-gcc
 PI_CFLAGS	?= -O3 -static -Wall -Wextra -pedantic -std=c11 -mcpu=cortex-a76
@@ -35,7 +35,7 @@ else
 endif
 
 
-COMMON = rgba_io.o
+COMMON = rgba_io.o pix_diff.o
 DIFF_OBJS = diff.o	$(COMMON)
 NEON_OBJS = neon-diff.o	$(COMMON)
 
@@ -54,7 +54,7 @@ neon-diff: $(NEON_OBJS)
 
 
 clean:
-	rm -f diff.o neon-diff.o rgba_io.o $(TARGETS)
+	rm -f diff.o neon-diff.o rgba_io.o pix_diff.o diff neon-diff $(TARGETS)
 
 
 .PHONY: all clean

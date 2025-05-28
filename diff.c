@@ -1,4 +1,5 @@
 #include "rgba_io.h"
+#include "pix_diff.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -10,8 +11,6 @@ The purpose of this program is to subtract one image layer's RGB values from
 another and output it's result in .rgba format. 
 */
 
-typedef enum { ABS, SAT, MOD } diff_mode_t;
-
 static void diff_rgba(uint32_t *img1, const uint32_t *img2, size_t size, diff_mode_t mode);
 
 int main(int argc, char *argv[])
@@ -21,7 +20,7 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 
-	diff_mode_t mode = ABS;
+	diff_mode_t mode = ABS;		// Set default mode to absolute.
 	if (argc == 5) {
 		if ((strcmp(argv[4], "saturated") == 0)||(strcmp(argv[4], "sat") == 0)) {
 			mode = SAT;
@@ -60,7 +59,7 @@ int main(int argc, char *argv[])
 		goto err;	
 	}
 
-	free(img1);
+	free(img1);	// Dump image memory on success path.
 	free(img2);
 
 	return EXIT_SUCCESS;
@@ -74,39 +73,11 @@ err:	// Dumps memory if image reading or writing error.
 
 static void diff_rgba(uint32_t *img1, const uint32_t *img2, size_t size, diff_mode_t mode)
 {
-	size_t pxs = size / sizeof(uint32_t);	// 'pxs' is the number of pixels in the image.
-	size_t i;
-	uint32_t pix1, pix2, pixout;
-	for (i = 0; i < pxs; ++i) {
-		pix1 = img1[i];
-		pix2 = img2[i];
-		pixout = 0;
-		int channel1, channel2, difference;
-		uint8_t output_channel;
-		
-		int shift;
-		for (shift = 0; shift <= 16; shift += 8) {
-			channel1 = (pix1 >> shift) & 0xFF;	// This isolates one color channel from the desired pixel, R(shift = 0) G(shift = 8), and B (shift = 16).
-			channel2 = (pix2 >> shift) & 0xFF;	// The alpha channel is skipped so that images are not transparent (unintended behavior). 
-			difference = channel1 - channel2;
-
-			switch (mode) {
-				case SAT:
-					output_channel = (difference < 0) ? 0 : (uint8_t)difference;	// If the computed difference is smaller than 0, clamp to 0.
-					break;
-				case MOD:
-					output_channel = (uint8_t)difference;				// Implicit declaration to unsigned for modulo 256 subtraction.
-					break;
-				case ABS:
-				default:
-					output_channel = (difference < 0) ? (uint8_t)(-difference) : (uint8_t)difference;	// Change sign of difference to find absolute value if negative.
-					break;
-			}
-
-			pixout |= (uint32_t)output_channel << shift;
-		}
-
-		img1[i] = pixout | 0xFF000000;	// Forces 100% opacity.
+	size_t num_pixels = size / sizeof(uint32_t);
+	
+	size_t px_idx;
+	for (px_idx = 0; px_idx < num_pixels; ++px_idx) {
+		img1[px_idx] = calculate_pixel_difference(img1[px_idx], img2[px_idx], mode);
 	}
 }
 
