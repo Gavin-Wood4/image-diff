@@ -43,13 +43,21 @@ NEON_OBJS = neon-diff.o	$(COMMON)
 all: $(TARGETS)
 
 diff: $(DIFF_OBJS)
-	$(CC) $(CFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $@ -lm
 
 neon-diff: $(NEON_OBJS)
-	$(CC) $(CFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $@ -lm
 
+rgba_io.o: rgba_io.c rgba_io.h stb_image.h
+	$(CC) $(CFLAGS) -w -c $< -o $@
 
-%.o: %.c rgba_io.h
+pix_diff.o: pix_diff.c pix_diff.h
+	$(CC) $(CFLAGS) -c $< -o $@
+
+diff.o: diff.c rgba_io.h pix_diff.h
+	$(CC) $(CFLAGS) -c $< -o $@
+
+neon-diff.o: neon-diff.c rgba_io.h pix_diff.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 

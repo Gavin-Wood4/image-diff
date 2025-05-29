@@ -39,11 +39,11 @@ int main(int argc, char *argv[])
 	uint32_t *img2 = NULL;
 	size_t size1, size2;
 
-	if (read_rgba(argv[1], &img1, &size1) == -1) {
+	if (read_image(argv[1], &img1, &size1) == -1) {
 		fprintf(stderr, "Error: Could not read '%s'.\n", argv[1]);
 		goto err;
 	}
-	if (read_rgba(argv[2], &img2, &size2) == -1) {
+	if (read_image(argv[2], &img2, &size2) == -1) {
 		fprintf(stderr, "Error: Could not read '%s'.\n", argv[2]);
 		goto err;
 	}
