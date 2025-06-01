@@ -1,19 +1,20 @@
-
 # Image Differencing Tool
 
-A command-line tool written in C to calculate the pixel by pixel difference of color between two RGBA image files. 
+A command-line tool written in C to calculate the pixel by pixel difference of color between two images. 
 
-This project demonstrates C programming fundamentals, memory management, command line argument parsing, and performance optimization using NEON for ARM64 architectures. 
+Current supported Extensions are `rgba` and `.png`.
+
+This project demonstrates C programming fundamentals, memory management, command line argument parsing, and performance optimization using NEON intrinsics for ARM64 architectures. 
 
 ## Features
 
 - **Standard/Portable C Executable (`diff`):** A portable version written using standard C11.
-- **NEON-Optimized Executable (`neon-diff`):** An ARM64-specific version using NEON intrinsics. (Work in progress. Only modular mode is working.)
+- **NEON-Optimized Executable (`neon-diff`):** An ARM64-specific version using NEON intrinsics. 
 - **Difference Modes:**
     - **[Default] Absolute (`abs`):** `|img1 - img2|`
     - **Saturated (`sat`):** `max(0, img1 - img2)`
     - **Modular (`mod`):** `(img1 - img2) % 256`
-- **RGBA IO:** Reads and writes RGBA images. 
+- **RGBA IO:** Reads and writes RGBA and PNG images.
 - **Native or Cross-compiler Build:** `Makefile` supporting native builds with architecture detection (x86_64/aarch64) and cross-compilation for Raspberry Pi 5 (Cortex-A76).
 - **C Standard Compliance:** Built with `-O3 -Wall -Wextra -pedantic` for performance and strict C11 compliance.
 
@@ -45,11 +46,11 @@ The two executables `diff` and `neon-diff` can be executed from the command line
 # Example using saturated difference (long name)
 ./diff image1.rgba image2.rgba output_sat.rgba saturated
 
-# Example using modular difference (short name)
-./diff image1.rgba image2.rgba output_mod.rgba mod
+# Example using modular difference (short name & png output)
+./diff image1.rgba image2.rgba output_mod.png mod
 
 # Example using neon-diff
-./neon-diff image1.rgba image2.rgba output_neon_mod.rgba mod
+./neon-diff image1.rgba image2.rgba output_neon_mod.png mod
 
 # Example using neon-diff with PNG input
 ./neon-diff image1.png image2.png output_neon_sat.rgba sat
@@ -68,7 +69,7 @@ Try installing `qemu-aarch64-static` and run using:
 
 - `diff.c`: Functionally complete and tested with all modes.
 - `neon-diff.c`: Functionally complete and tested with all modes. 
-- `rgba_io`: Functionally complete. 
+- `rgba_io`: Functionally complete. Supports input and output of PNG and RGBA files.  
 - No script to test functionality and performance of each executable and compare. 
 
 ## To-Do
@@ -80,9 +81,9 @@ Try installing `qemu-aarch64-static` and run using:
 	- [ ] diff.c
 	- [ ] neon-diff.c
     - [ ] pix_diff
-- [1/2] Add support for common image formats (PNG/JPG)
+- [X] Add support for common image formats (PNG/JPG)
     - [X] Input
-    - [ ] Output
+    - [X] Output
 
 ## Third-Party Libraries
 

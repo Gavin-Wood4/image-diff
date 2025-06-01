@@ -6,10 +6,10 @@ HOST	?= 0
 
 
 HOST_CC		?= gcc
-HOST_CFLAGS	?= -O3 -Wall -Wextra -pedantic -fanalyzer -Wconversion -Wsign-conversion -Wshadow -Wpointer-arith -Wcast-align -Wcast-qual -Wstrict-overflow=5 -std=c11
+HOST_CFLAGS	?= -O3 -static -Wall -Wextra -pedantic -Wconversion -Wsign-conversion -Wshadow -Wpointer-arith -Wcast-align -Wcast-qual -Wstrict-overflow=5 -std=c11 -Wno-unused-parameter
 
 PI_CC		?= aarch64-linux-gnu-gcc
-PI_CFLAGS	?= -O3 -static -Wall -Wextra -pedantic -std=c11 -mcpu=cortex-a76
+PI_CFLAGS	?= -O3 -static -Wall -Wextra -pedantic -Wconversion -Wsign-conversion -Wshadow -Wpointer-arith -Wcast-align -Wcast-qual -Wstrict-overflow=5 -std=c11 -Wno-unused-parameter -mcpu=cortex-a76
 
 # Picks compiler and flags depending on command line switch and processor architecture detection.
 ifneq ($(HOST),1)
@@ -48,8 +48,8 @@ diff: $(DIFF_OBJS)
 neon-diff: $(NEON_OBJS)
 	$(CC) $(CFLAGS) $^ -o $@ -lm
 
-rgba_io.o: rgba_io.c rgba_io.h stb_image.h
-	$(CC) $(CFLAGS) -w -c $< -o $@
+rgba_io.o: rgba_io.c rgba_io.h stb_image.h stb_image_write.h
+	$(CC) $(CFLAGS) -c $< -o $@
 
 pix_diff.o: pix_diff.c pix_diff.h
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -66,3 +66,4 @@ clean:
 
 
 .PHONY: all clean
+
