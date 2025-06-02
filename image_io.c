@@ -1,4 +1,4 @@
-#include "rgba_io.h"
+#include "image_io.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>

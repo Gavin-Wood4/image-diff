@@ -1,4 +1,4 @@
-#include "rgba_io.h"
+#include "image_io.h"
 #include "pix_diff.h"
 #include <stdio.h>
 #include <stdlib.h>

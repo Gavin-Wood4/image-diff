@@ -1,5 +1,5 @@
-#ifndef RGBA_IO_H
-#define RGBA_IO_H
+#ifndef IMAGE_IO_H
+#define IMAGE_IO_H
 
 #include <stdint.h>
 #include <stddef.h>

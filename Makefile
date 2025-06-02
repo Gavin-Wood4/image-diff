@@ -35,7 +35,7 @@ else
 endif
 
 
-COMMON = rgba_io.o pix_diff.o
+COMMON = image_io.o pix_diff.o
 DIFF_OBJS = diff.o	$(COMMON)
 NEON_OBJS = neon-diff.o	$(COMMON)
 
@@ -48,21 +48,21 @@ diff: $(DIFF_OBJS)
 neon-diff: $(NEON_OBJS)
 	$(CC) $(CFLAGS) $^ -o $@ -lm
 
-rgba_io.o: rgba_io.c rgba_io.h stb_image.h stb_image_write.h
+image_io.o: image_io.c image_io.h stb_image.h stb_image_write.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 pix_diff.o: pix_diff.c pix_diff.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
-diff.o: diff.c rgba_io.h pix_diff.h
+diff.o: diff.c image_io.h pix_diff.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
-neon-diff.o: neon-diff.c rgba_io.h pix_diff.h
+neon-diff.o: neon-diff.c image_io.h pix_diff.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 
 clean:
-	rm -f diff.o neon-diff.o rgba_io.o pix_diff.o diff neon-diff $(TARGETS)
+	rm -f diff.o neon-diff.o image_io.o pix_diff.o diff neon-diff $(TARGETS)
 
 
 .PHONY: all clean
