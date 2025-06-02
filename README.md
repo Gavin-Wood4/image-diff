@@ -69,7 +69,7 @@ Try installing `qemu-aarch64-static` and run using:
 
 - `diff.c`: Functionally complete and tested with all modes.
 - `neon-diff.c`: Functionally complete and tested with all modes. 
-- `rgba_io`: Functionally complete. Supports input and output of PNG and RGBA files.  
+- `image_io`: Functionally complete. Supports input and output of PNG and RGBA files.  
 - No script to test functionality and performance of each executable and compare. 
 
 ## To-Do
@@ -77,7 +77,7 @@ Try installing `qemu-aarch64-static` and run using:
 - [X] Add and test absolute, saturation, and modular subtraction modes in neon-diff.c
 - [ ] Create performance benchmark scripts and document comparisons between `diff.c` and `neon-diff.c`
 - [ ] Unit tests for all functions in each program. 
-	- [ ] rgba_io
+	- [ ] image_io
 	- [ ] diff.c
 	- [ ] neon-diff.c
     - [ ] pix_diff
