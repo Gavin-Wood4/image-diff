@@ -16,50 +16,38 @@ ifneq ($(HOST),1)
 	ifeq ($(PI),1)
 		CC	:= $(PI_CC)
 		CFLAGS	:= $(PI_CFLAGS)
-		TARGETS	:= diff neon-diff
 	else
 		ifeq ($(shell uname -m),aarch64)	# Processor architecture is detected.
 			CC	:= $(HOST_CC)
 			CFLAGS	:= $(HOST_CFLAGS) -mcpu=native
-			TARGETS	:= diff neon-diff
 		else					# If processor architecture is not aarch64.
 			CC	:= $(HOST_CC)
 			CFLAGS	:= $(HOST_CFLAGS)
-			TARGETS	:= diff
 		endif
 	endif
 else
 	CC	:= $(HOST_CC)
 	CFLAGS	:= $(HOST_CFLAGS)
-	TARGETS := diff
 endif
 
-
+TARGET = diff
 COMMON = image_io.o pix_diff.o
 DIFF_OBJS = diff.o	$(COMMON)
-NEON_OBJS = neon-diff.o	$(COMMON)
 
 
-all: $(TARGETS)
+all: $(TARGET)
 
-diff: $(DIFF_OBJS)
-	$(CC) $(CFLAGS) $^ -o $@ -lm
-
-neon-diff: $(NEON_OBJS)
+$(TARGET): $(DIFF_OBJS)
 	$(CC) $(CFLAGS) $^ -o $@ -lm
 
 image_io.o: image_io.c image_io.h stb_image.h stb_image_write.h
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c -w $< -o $@
 
 pix_diff.o: pix_diff.c pix_diff.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
 diff.o: diff.c image_io.h pix_diff.h
 	$(CC) $(CFLAGS) -c $< -o $@
-
-neon-diff.o: neon-diff.c image_io.h pix_diff.h
-	$(CC) $(CFLAGS) -c $< -o $@
-
 
 clean:
 	rm -f diff.o neon-diff.o image_io.o pix_diff.o diff neon-diff $(TARGETS)

@@ -1,21 +1,24 @@
+
 # Image Differencing Tool
 
 A command-line tool written in C to calculate the pixel by pixel difference of color between two images. 
 
-Current supported Extensions are `rgba` and `.png`.
+Current supported input/output extensions are `rgba` and `.png`.
 
 This project demonstrates C programming fundamentals, memory management, command line argument parsing, and performance optimization using NEON intrinsics for ARM64 architectures. 
 
 ## Features
 
-- **Standard/Portable C Executable (`diff`):** A portable version written using standard C11.
-- **NEON-Optimized Executable (`neon-diff`):** An ARM64-specific version using NEON intrinsics. 
+- **Portable C Executable (`diff`):** A portable version written using standard C11. Compiles `diff_neon()` conditional on presence of `__ARM_NEON` preprocessor macro definition.
 - **Difference Modes:**
     - **[Default] Absolute (`abs`):** `|img1 - img2|`
     - **Saturated (`sat`):** `max(0, img1 - img2)`
     - **Modular (`mod`):** `(img1 - img2) % 256`
-- **RGBA IO:** Reads and writes RGBA and PNG images.
-- **Native or Cross-compiler Build:** `Makefile` supporting native builds with architecture detection (x86_64/aarch64) and cross-compilation for Raspberry Pi 5 (Cortex-A76).
+- **Disable Neon Difference Flag:**
+	- **disable_neon:** Forces scalar differencing if last argument passed is `disable_neon`
+- **Image IO:** Reads and writes RGBA and PNG images.
+- **Pix Diff:** Calculates and returns the image difference data buffer from the passed `img1` and `img2` and `size`.
+- **Native or Cross-compiler Build:** `Makefile` supports native builds with architecture detection (x86_64/aarch64) and cross-compilation for Raspberry Pi 5 (Cortex-A76).
 - **C Standard Compliance:** Built with `-O3 -Wall -Wextra -pedantic` for performance and strict C11 compliance.
 
 ## Building
@@ -26,10 +29,10 @@ The project can be built using the provided `Makefile`.
 # Clean previous builds
 make clean
 
-# Build for native host (auto-detects aarch64 for `neon-diff`)
+# Build for native host (auto-detects aarch64 or other)
 make
 
-# Force a HOST-only build (only builds 'diff')
+# Force a HOST-only build (only builds based on native preprocessor macros)
 make HOST=1
 
 # Cross-compile for Raspberry Pi 5 (requires aarch64-linux-gnu-gcc)
@@ -38,7 +41,7 @@ make PI=1
 
 ## Usage
 
-The two executables `diff` and `neon-diff` can be executed from the command line. 
+The executable `diff` can be executed from the command line. 
 ```bash
 # Example using absolute difference (default)
 ./diff image1.rgba image2.rgba output_abs.rgba
@@ -49,47 +52,47 @@ The two executables `diff` and `neon-diff` can be executed from the command line
 # Example using modular difference (short name & png output)
 ./diff image1.rgba image2.rgba output_mod.png mod
 
-# Example using neon-diff
-./neon-diff image1.rgba image2.rgba output_neon_mod.png mod
+# Example using disable_neon flag and mixed extension input
+./diff image1.png image2.rgba output_abs_scalar.png disable_neon
 
-# Example using neon-diff with PNG input
-./neon-diff image1.png image2.png output_neon_sat.rgba sat
-
-# Example using neon-diff with mixed file type
-./neon-diff image1.rgba image2.png output_neon_abs.rgba
+# Example using saturated difference, disable_neon flag, and mixed extension output
+./diff image1.png image2.png output_sat_scalar.rgba sat disable_neon
 ```
 
-If running cross-compiled neon-diff on x86_64, and received an error:
-`-bash: ./neon-diff: cannot execute binary file: Exec format error`
+If running cross-compiled `diff` for aarch64 using `make PI=1` on x86_64, and received an error:
+`-bash: ./diff: cannot execute binary file: Exec format error`
 
 Try installing `qemu-aarch64-static` and run using:
-`qemu-aarch64-static ./neon-diff image1.rgba image2.rgba output_neon_mod.rgba`
+`qemu-aarch64-static ./diff image1.png image2.png output.png`
 
 ## Project Status
 
 - `diff.c`: Functionally complete and tested with all modes.
-- `neon-diff.c`: Functionally complete and tested with all modes. 
-- `image_io`: Functionally complete. Supports input and output of PNG and RGBA files.  
+- `image_io`: Functionally complete. Supports input and output of PNG and RGBA files. May add JPG input and output and some other common types (BMP).
+- `pix_diff`: Functionally complete. Supports scalar based or manually vectorized subtraction of pixels. 
 - No script to test functionality and performance of each executable and compare. 
 
 ## To-Do
 
 - [X] Add and test absolute, saturation, and modular subtraction modes in neon-diff.c
-- [ ] Create performance benchmark scripts and document comparisons between `diff.c` and `neon-diff.c`
+- [ ] Create performance benchmark scripts and document comparisons between neon and scalar pixel differencing functions.
 - [ ] Unit tests for all functions in each program. 
 	- [ ] image_io
 	- [ ] diff.c
-	- [ ] neon-diff.c
     - [ ] pix_diff
-- [X] Add support for common image formats (PNG/JPG)
-    - [X] Input
-    - [X] Output
+- [X] Add support for common image formats
+    - [X] RGBA
+    - [X] PNG
+    - [ ] JPG
+    - [ ] BMP
+    - [ ] Maybe SVGs somehow?
+    - [ ] GIFs would be mega cool, frame by frame. May be better to make this a library and call for that. 
 
 ## Third-Party Libraries
 
 This project uses a third-party library:
 
-### stb_image.h
+### stb_image.h & stb_image_write.h
 
 -   **Author:** Sean Barrett
 -   **Repository:** [https://github.com/nothings/stb](https://github.com/nothings/stb)

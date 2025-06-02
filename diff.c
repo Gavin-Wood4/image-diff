@@ -13,23 +13,42 @@ another and output it's result in .rgba format.
 
 int main(int argc, char *argv[])
 {
-	if (argc != 4 && argc != 5) {
-		fprintf(stderr, "Usage: %s <image1> <image2> <output.[png|rgba]> <absolute|abs|saturated|sat|modular|mod>\n", argv[0]);
+	if (argc < 4 || argc > 6) {
+		fprintf(stderr, "Usage: %s <image1> <image2> <output.{png,rgba}> [absolute|abs|saturated|sat|modular|mod] [disable_neon]\n", argv[0]);
 		return EXIT_FAILURE;
 	}
 
 	diff_mode_t mode = ABS;		// Set default mode to absolute.
-	if (argc == 5) {
+	int disable_neon = 0;
+	if (argc >= 5) {
 		if ((strcmp(argv[4], "saturated") == 0)||(strcmp(argv[4], "sat") == 0)) {
 			mode = SAT;
 		} else if ((strcmp(argv[4], "modular") == 0)||(strcmp(argv[4], "mod") == 0)) {
 			mode = MOD;
 		} else if ((strcmp(argv[4], "absolute") == 0)||(strcmp(argv[4], "abs") == 0)) {
 			mode = ABS;
+		} else if (strcmp(argv[4], "disable_neon") == 0) {
+			disable_neon = 1;
+			if (argc == 6) {	// If argv[4] is 'disable_neon', nothing should be in argv[5].
+				fprintf(stderr, "Error(%s): Invalid argument '%s' after '%s'.\n", __func__, argv[5], argv[4]);
+				fprintf(stderr, "Usage: %s <image1> <image2> <output.{png,rgba}> [absolute|abs|saturated|sat|modular|mod] [disable_neon]\n", argv[0]);
+				return EXIT_FAILURE;
+			}
 		}
 		else {
-			fprintf(stderr, "Error(%s): Invalid mode '%s'.\nUse: absolute (abs), saturated (sat), or modular (mod).\n", __func__, argv[4]);
+			disable_neon = 1;
+			fprintf(stderr, "Error(%s): Invalid fifth argument '%s'.\n", __func__, argv[4]);
+			fprintf(stderr, "Usage: %s <image1> <image2> <output.{png,rgba}> [absolute|abs|saturated|sat|modular|mod] [disable_neon]\n", argv[0]);
 			return EXIT_FAILURE;
+		}
+		if (argc == 6 && !disable_neon) {	// If argv[4] was disable_neon, argv[5] would not be checked for disable_neon here.
+			if (strcmp(argv[5], "disable_neon") == 0) {
+				disable_neon = 1;
+			} else {
+				fprintf(stderr, "Error(%s): Invalid sixth argument '%s'.\n)", __func__, argv[5]);
+				fprintf(stderr, "Usage: %s <image1> <image2> <output.{png,rgba}> [absolute|abs|saturated|sat|modular|mod] [disable_neon]\n", argv[0]);
+				return EXIT_FAILURE;
+			}
 		}
 	}
 
@@ -68,7 +87,17 @@ int main(int argc, char *argv[])
 		goto err;
 	}
 
-	diff_scalar(img1, img2, size1, mode);
+#ifdef __ARM_NEON
+	if (disable_neon) {
+		fprintf(stdout, "Info(%s): Using scalar differencing. NEON differencing disabled.\n", __func__);
+		diff_scalar(img1, img2, size1, mode);
+	} else {
+		fprintf(stdout, "Info(%s): Using NEON differencing.\n", __func__);
+		diff_neon(img1, img2, size1, mode);
+	}
+#else
+	fprintf(stdout, "Info(%s): Using scalar differencing. (NEON differencing is not compiled.)\n", __func__);
+#endif
 
 	int width_for_png = 0, height_for_png = 0;
 
@@ -93,7 +122,7 @@ int main(int argc, char *argv[])
 err:	// Dumps memory if image reading or writing error. 
 	if (img1) free(img1);
 	if (img2) free(img2);
-	fprintf(stderr, "Exiting due to failure.\n");	// There will be specific descriptive to the error messages above this from throughout the program.
+	fprintf(stderr, "Error(%s): Exiting due to failure.\n", __func__);	// There will be specific descriptive to the error messages above this from throughout the program.
 	return EXIT_FAILURE;
 }
 
