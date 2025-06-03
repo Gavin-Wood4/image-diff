@@ -74,7 +74,6 @@ Try installing `qemu-aarch64-static` and run using:
 
 ## To-Do
 
-- [X] Add and test absolute, saturation, and modular subtraction modes in neon-diff.c
 - [ ] Create performance benchmark scripts and document comparisons between neon and scalar pixel differencing functions.
 - [ ] Unit tests for all functions in each program. 
 	- [ ] image_io

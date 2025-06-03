@@ -97,6 +97,7 @@ int main(int argc, char *argv[])
 	}
 #else
 	fprintf(stdout, "Info(%s): Using scalar differencing. (NEON differencing is not compiled.)\n", __func__);
+	diff_scalar(img1, img2, size1, mode);
 #endif
 
 	int width_for_png = 0, height_for_png = 0;
