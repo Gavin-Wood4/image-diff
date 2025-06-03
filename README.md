@@ -86,7 +86,8 @@ Try installing `qemu-aarch64-static` and run using:
     - [ ] JPG
     - [ ] BMP
     - [ ] Maybe SVGs somehow?
-    - [ ] GIFs would be mega cool, frame by frame. May be better to make this a library and call for that. 
+    - [ ] GIFs would be mega cool, frame by frame. May be better to make this a library and call for that.
+- [ ] Change core logic to be a single linkable library (?)
 
 ## Third-Party Libraries
 
